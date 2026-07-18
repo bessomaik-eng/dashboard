@@ -1,12 +1,422 @@
 <!DOCTYPE html>
-  <html lang="de">
-  <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard</title>
-  </head>
-  <body>
-  <h1>Dashboard</h1>
-  <p>Willkommen! Deine Seite ist online.</p>
-  </body>
-  </html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bestell-CRM</title>
+<style>
+:root {
+color-scheme: light;
+--page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+--grid:#e1e0d9; --border:rgba(11,11,11,.10); --warn:#fab219; --crit:#d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+:root {
+color-scheme: dark;
+--page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+--grid:#2c2c2a; --border:rgba(255,255,255,.10);
+}
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--page); color:var(--ink);
+font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; padding:16px; }
+.wrap { max-width:960px; margin:0 auto; }
+h1 { font-size:20px; margin:0 0 2px; }
+.stand { color:var(--muted); font-size:12px; margin-bottom:18px; }
+.tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin-bottom:18px; }
+.tile { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+.tv { font-size:26px; font-weight:650; }
+.tl { color:var(--ink2); font-size:12px; }
+.tile.warn .tv { color:var(--warn); }
+.tile.crit .tv { color:var(--crit); }
+.ghead { font-size:12px; text-transform:uppercase; letter-spacing:.06em;
+color:var(--muted); margin:20px 0 10px; }
+.vghead { margin-top:28px; }
+/* Hersteller-Karte (details/summary, kein JS noetig) */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:12px; }
+.mcard { border-left:4px solid var(--mc); }
+summary { list-style:none; cursor:pointer; }
+summary::-webkit-details-marker { display:none; }
+.mhead { display:flex; align-items:center; gap:10px; padding:12px 14px;
+background:color-mix(in srgb, var(--mc) 7%, transparent); border-radius:9px 9px 0 0; }
+.mcard:not([open]) .mhead { border-radius:9px; }
+.mcard[open] .mhead { border-bottom:1px solid color-mix(in srgb, var(--mc) 25%, transparent); }
+.chev { color:var(--muted); font-size:12px; flex:none; transition:transform .15s ease; width:14px; }
+.mcard[open] > .mhead .chev { transform:rotate(90deg); }
+.mtitle { flex:1 1 auto; min-width:0; }
+.mname { display:block; font-size:15px; font-weight:700; }
+.mdot { display:inline-block; width:10px; height:10px; border-radius:50%;
+background:var(--mc); margin-right:8px; }
+.memail { display:block; color:var(--muted); font-size:12px; overflow-wrap:anywhere; }
+.mailwarn { color:var(--crit); font-weight:600; }
+.mcount { color:var(--ink2); font-size:12px; text-align:right; flex:none; }
+.tcount { color:var(--ink2); }
+.mbody { padding:6px 14px 14px; }
+/* Verifizierungs-Karten */
+.vcard { border-left:4px double var(--mc);
+background:color-mix(in srgb, var(--surface) 94%, var(--mc) 6%); }
+.vcard .mhead { background:none; }
+.vcard[open] .mhead { border-bottom:1px dashed color-mix(in srgb, var(--mc) 40%, transparent); }
+.vcard .mdot { border-radius:2px; transform:rotate(45deg); width:9px; height:9px; }
+.vbadge { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase;
+letter-spacing:.05em; color:var(--mc); border:1px dashed var(--mc);
+border-radius:4px; padding:1px 6px; margin-left:8px; vertical-align:2px; }
+/* Typ-Gruppen */
+.grow { padding:14px 0 6px; border-bottom:2px solid var(--mc); margin-bottom:2px; }
+.glabel { font-size:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; }
+.gdesc { color:var(--muted); font-size:11px; margin-left:10px; }
+/* Bestell-Zeile (details/summary) */
+.orow { border-bottom:1px solid var(--grid); }
+.orow:last-of-type { border-bottom:none; }
+.ogrid { display:grid; gap:4px 12px; padding:10px 0; align-items:start;
+grid-template-columns:minmax(140px,2fr) 86px minmax(140px,1fr) minmax(130px,1fr) 90px minmax(150px,2fr); }
+.ogrid:hover { background:color-mix(in srgb, var(--ink) 3%, transparent); }
+.c-prod strong { font-size:13.5px; }
+.arrow { display:inline-block; width:14px; color:var(--muted); font-size:11px;
+transition:transform .15s ease; }
+.orow[open] .arrow { transform:rotate(90deg); }
+.sub { display:block; color:var(--muted); font-size:11px; margin-left:14px; }
+.c-action .sub { margin-left:0; }
+.ml { display:none; color:var(--muted); }
+.c-date, .c-contact { font-size:13px; }
+.due { color:var(--crit); font-weight:600; }
+.due .sub { color:var(--crit); }
+.chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--border);
+border-radius:999px; padding:2px 10px 2px 7px; font-size:12px; white-space:nowrap; background:var(--page); }
+.dot { width:8px; height:8px; border-radius:50%; flex:none; }
+.ic { font-size:11px; }
+.shipline { display:block; font-size:12px; }
+.shipline.ok { font-weight:600; }
+.shipline.muted { color:var(--muted); }
+.shipline code { font-size:11px; background:color-mix(in srgb, var(--ink) 6%, transparent);
+padding:1px 5px; border-radius:4px; overflow-wrap:anywhere; }
+/* Verlauf je Bestellung */
+.hbox { padding:8px 10px 12px 14px; background:color-mix(in srgb, var(--ink) 2.5%, transparent);
+border-radius:8px; margin:0 0 10px; }
+.htitle { font-size:11px; text-transform:uppercase; letter-spacing:.04em;
+color:var(--muted); font-weight:600; margin-bottom:6px; }
+.hrow { display:grid; grid-template-columns:86px 150px 1fr; gap:10px;
+padding:5px 0; border-bottom:1px dashed var(--grid); font-size:12.5px; }
+.hrow:last-child { border-bottom:none; }
+.hdate { color:var(--muted); white-space:nowrap; }
+.hevent { font-weight:600; }
+.hdetails { color:var(--ink2); }
+/* Aufgaben */
+.tasks { margin-top:14px; border-top:2px solid var(--mc); padding-top:8px; }
+.tlabel { margin-bottom:6px; display:block; }
+.trow { display:grid; grid-template-columns:130px 1fr; gap:12px; align-items:start;
+padding:8px 0; border-bottom:1px dashed var(--grid); font-size:13px; }
+.trow:last-child { border-bottom:none; }
+.tdetails { color:var(--ink2); font-size:12px; }
+.tmeta { color:var(--muted); font-size:11px; margin-top:2px; }
+/* Globaler Verlauf */
+h3 { font-size:13px; color:var(--ink2); margin:22px 0 8px; }
+.logcard { padding:10px 14px; }
+.lrow { display:grid; grid-template-columns:86px 140px 150px 1fr; gap:10px;
+padding:7px 0; border-bottom:1px solid var(--grid); font-size:12.5px; }
+.lrow:last-child { border-bottom:none; }
+.ld { color:var(--muted); white-space:nowrap; }
+.lwho { font-weight:600; }
+.ldetails { color:var(--ink2); }
+footer { color:var(--muted); font-size:11px; margin-top:22px; }
+/* ---------- Responsive: Handy ---------- */
+@media (max-width:700px) {
+body { padding:10px; }
+.mhead { flex-wrap:wrap; }
+.mcount { flex-basis:100%; text-align:left; padding-left:24px; }
+.ogrid { grid-template-columns:1fr 1fr; }
+.c-prod { grid-column:1 / -1; }
+.c-action { grid-column:1 / -1; }
+.c-ship { text-align:right; }
+.ml { display:inline; font-size:11px; }
+.hrow { grid-template-columns:80px 1fr; }
+.hdetails { grid-column:1 / -1; }
+.trow { grid-template-columns:1fr; gap:4px; }
+.lrow { grid-template-columns:80px 1fr; }
+.ldetails { grid-column:1 / -1; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Bestell-CRM</h1>
+<div class="stand">Muster- &amp; Produktbestellungen bei Herstellern · Stand: 18.07.2026</div>
+<div class="tiles">
+<div class="tile"><div class="tv">17</div><div class="tl">Offene Bestellungen</div></div>
+<div class="tile"><div class="tv">2</div><div class="tl">Warten auf Antwort</div></div>
+<div class="tile warn"><div class="tv">16</div><div class="tl">Aktionen fällig</div></div>
+<div class="tile "><div class="tv">0</div><div class="tl">Probleme</div></div>
+</div>
+<h3 class="ghead">Hersteller</h3>
+<details class="card mcard mc-0" id="man-H1">
+<summary class="mhead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname"><span class="mdot"></span>Testfirma (Testlauf)</span>
+<span class="memail">bessomaik@gmail.com</span></span>
+<span class="mcount">2 Bestellungen</span>
+</summary>
+<div class="mbody">
+<div class="grow"><span class="glabel">🧪 Muster</span><span class="gdesc">Musterbestellungen zum Testen · 1</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Testprodukt A</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>30.06.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Testprodukt A (1 Einträge)</div><div class='hrow'><span class='hdate'>30.06.2026</span><span class='hevent'>Bestellung erfasst</span><span class='hdetails'>Muster 'Testprodukt A' bei Testfirma bestellt.</span></div></div>
+</details><div class="grow"><span class="glabel">📦 Bulk-Bestellungen</span><span class="gdesc">Richtige Bestellungen / Bulk Orders · 1</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Testprodukt B</strong><span class="sub">Bulk · TP-B-100</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>07.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#fab219"></span><span class="ic">⏳</span>Wartet auf Antwort</span></div>
+<div class="c-ship"><span class='shipline'>Fertig&nbsp;ca. <strong>18.07.2026</strong></span><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>09.07.2026</div>
+<div class="c-action due">Nachfassen, falls bis dahin keine Antwort<span class="sub">fällig 16.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Testprodukt B (2 Einträge)</div><div class='hrow'><span class='hdate'>09.07.2026</span><span class='hevent'>Anfrage gesendet</span><span class='hdetails'>Statusanfrage zu 'Testprodukt B' an bessomaik@gmail.com geschickt. Status: Wartet auf Antwort.</span></div><div class='hrow'><span class='hdate'>07.07.2026</span><span class='hevent'>Bestellung erfasst</span><span class='hdetails'>'Testprodukt B' (TP-B-100) bei Testfirma bestellt.</span></div></div>
+</details>
+</div>
+</details>
+<details class="card mcard mc-1" id="man-H2">
+<summary class="mhead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname"><span class="mdot"></span>Hersteller 2 Test</span>
+<span class="memail">bessomaik@gmail.com</span></span>
+<span class="mcount">1 Bestellung</span>
+</summary>
+<div class="mbody">
+<div class="grow"><span class="glabel">🧪 Muster</span><span class="gdesc">Musterbestellungen zum Testen · 1</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Testprodukt C</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>10.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#256abf"></span><span class="ic">🚚</span>Versendet</span></div>
+<div class="c-ship"><span class='shipline'>Fertig&nbsp;ca. <strong>11.07.2026</strong></span><span class='shipline ok'>✈ Versendet 12.07.2026</span><span class='shipline'><code>TEST-123456789-DE</code></span><span class='shipline'>Ankunft&nbsp;ca. <strong>20.07.2026</strong></span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action ">Ankunft prüfen<span class="sub">fällig 20.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Testprodukt C (2 Einträge)</div><div class='hrow'><span class='hdate'>14.07.2026</span><span class='hevent'>Versendet (Beispiel)</span><span class='hdetails'>Testprodukt C als versendet markiert: Tracking TEST-123456789-DE, Ankunft ca. 20.07.2026 (Demo der neuen Lieferfelder).</span></div><div class='hrow'><span class='hdate'>10.07.2026</span><span class='hevent'>Bestellung erfasst</span><span class='hdetails'>Muster 'Testprodukt C' bei Hersteller 2 Test bestellt.</span></div></div>
+</details>
+</div>
+</details>
+<details class="card mcard mc-2" id="man-H3">
+<summary class="mhead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname"><span class="mdot"></span>Jenny</span>
+<span class="memail">Jenny@healthsupplementfactory.com</span></span>
+<span class="mcount">6 Bestellungen</span>
+</summary>
+<div class="mbody">
+<div class="grow"><span class="glabel">🧪 Muster</span><span class="gdesc">Musterbestellungen zum Testen · 6</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Pulver – Cookies & Cream Flavor</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 6 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Pulver – Cookies & Cream Flavor (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Pulver – Chocolate Flavor</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 6 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Pulver – Chocolate Flavor (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Pulver – Salted Caramel Flavor</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 6 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Pulver – Salted Caramel Flavor (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Pulver – Strawberry Flavor</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 6 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Pulver – Strawberry Flavor (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Pulver – Vanilla Flavor</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 6 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Pulver – Vanilla Flavor (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Pulver – Coffee Flavor</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 6 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Pulver – Coffee Flavor (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details>
+</div>
+</details>
+<details class="card mcard mc-3" id="man-H4">
+<summary class="mhead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname"><span class="mdot"></span>Rejina</span>
+<span class="memail">Rejina@jiabeikang.net</span></span>
+<span class="mcount">1 Bestellung</span>
+</summary>
+<div class="mbody">
+<div class="grow"><span class="glabel">📦 Bulk-Bestellungen</span><span class="gdesc">Richtige Bestellungen / Bulk Orders · 1</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Shilajit</strong><span class="sub">Bulk</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#ec835a"></span><span class="ic">€</span>Wartet auf Zahlung</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Zahlung anweisen: $2.751 per SWIFT/CHATS, Invoice-Nr. im Verwendungszweck<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Shilajit (2 Einträge)</div><div class='hrow'><span class='hdate'>14.07.2026</span><span class='hevent'>Bestellung erfasst</span><span class='hdetails'>Bulk-Order Shilajit bei Rejina erfasst. Status: Wartet auf unsere Zahlung. E-Mail-Adresse fehlt noch.</span></div><div class='hrow'><span class='hdate'>14.07.2026</span><span class='hevent'>Zahlungsdaten erhalten</span><span class='hdetails'>Bankverbindung für Shilajit-Bulk-Order erhalten (DBS Bank Hong Kong, HKGZKNBJ LIMITED). Betrag: $2.751 = 2.413,37 EUR. Zahlung per SWIFT/CHATS, Invoice-Nr. im Verwendungszweck.</span></div></div>
+</details>
+</div>
+</details>
+<details class="card mcard mc-4" id="man-H5">
+<summary class="mhead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname"><span class="mdot"></span>Victor</span>
+<span class="memail">bv3994470@gmail.com</span></span>
+<span class="mcount">4 Bestellungen · <span class="tcount">📋 1 offen</span></span>
+</summary>
+<div class="mbody">
+<div class="grow"><span class="glabel">🧪 Muster</span><span class="gdesc">Musterbestellungen zum Testen · 3</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Powder – Salted Caramel</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 3 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Powder – Salted Caramel (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Powder – Cookies & Cream</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 3 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Powder – Cookies & Cream (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Powder – Chocolate Peanut Butter</strong><span class="sub">Muster</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 3 Sorten)<span class="sub">fällig 15.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Powder – Chocolate Peanut Butter (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><div class="grow"><span class="glabel">📦 Bulk-Bestellungen</span><span class="gdesc">Richtige Bestellungen / Bulk Orders · 1</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Collagen Sachets</strong><span class="sub">Bulk</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>15.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#1baf7a"></span><span class="ic">📦</span>Versandbereit</span></div>
+<div class="c-ship"><span class='shipline'>Fertig&nbsp;ca. <strong>15.07.2026</strong></span><span class='shipline muted'>Noch nicht versendet</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>15.07.2026</div>
+<div class="c-action due">Versand klären: Abholung/Spedition, Versanddatum + Tracking erfragen<span class="sub">fällig 17.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Collagen Sachets (1 Einträge)</div><div class='hrow'><span class='hdate'>15.07.2026</span><span class='hevent'>Produktion fertig</span><span class='hdetails'>Victor meldet: Collagen Sachets fertig produziert. 31 Kartons (30 volle à 30 Boxen + 1 kleiner mit 2 Boxen = 902 Boxen). Kartonmaß 64 x 38,5 x 39 cm, 17,5 kg/Karton, gesamt ca. 2,98 m³ / ~540 kg. Versandbereit — Versanddetails offen.</span></div></div>
+</details>
+<div class="tasks"><div class="glabel tlabel">📋 Aufgaben &amp; Klärungen</div><div class="trow"><div><span class="chip"><span class="dot" style="background:#fab219"></span><span class="ic">⏳</span>In Klärung</span></div>
+<div><strong>Organic Certificate für Vegan Protein</strong><div class="tdetails">Victor prüft gerade, ob ein Organic-Zertifikat für das Protein möglich ist / vorliegt.</div><div class="tmeta">bei: Victor · seit 18.07.2026</div></div></div></div>
+</div>
+</details>
+<h3 class="ghead vghead">Verifizierungen &amp; Zertifizierungen</h3>
+<details class="card mcard mc-5 vcard" id="man-H6">
+<summary class="mhead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname"><span class="mdot"></span>Eurofins Verification<span class="vbadge">🔍 Verifizierung</span></span>
+<span class="memail">certification_efct@us4.eurofins-info.com</span></span>
+<span class="mcount">1 Vorgang</span>
+</summary>
+<div class="mbody">
+<div class="grow"><span class="glabel">🔍 Verifizierung</span><span class="gdesc">Produkt-Freischaltung / Zertifizierung · 1</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Apple Cider 7 Day Trial – Produkt-Freischaltung</strong><span class="sub">Verifizierung · TR178109169477623 · ASIN B0H3TP27BJ</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#fab219"></span><span class="ic">⏳</span>Wartet auf Antwort</span></div>
+<div class="c-ship"><span class='shipline muted'>–</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">Verifizierungsstatus bei Eurofins anfragen (Referenz TR178109169477623)<span class="sub">fällig 16.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Apple Cider 7 Day Trial – Produkt-Freischaltung (1 Einträge)</div><div class='hrow'><span class='hdate'>14.07.2026</span><span class='hevent'>Vorgang erfasst</span><span class='hdetails'>Eurofins-Verifizierung für 'Apple Cider 7 Day Trial' erfasst (TR178109169477623 / ASIN B0H3TP27BJ). Ziel: Produkt-Freischaltung.</span></div></div>
+</details>
+</div>
+</details>
+<details class="card mcard mc-6 vcard" id="man-H7">
+<summary class="mhead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname"><span class="mdot"></span>Dubai Product Verification<span class="vbadge">🔍 Verifizierung</span></span>
+<span class="memail"><span class="mailwarn">⚠ E-Mail-Adresse fehlt</span></span></span>
+<span class="mcount">2 Vorgänge</span>
+</summary>
+<div class="mbody">
+<div class="grow"><span class="glabel">🔍 Verifizierung</span><span class="gdesc">Produkt-Freischaltung / Zertifizierung · 2</span></div><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Vegan Protein Powder – Produkt-Verifizierung Dubai</strong><span class="sub">Verifizierung</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>–</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">E-Mail-Adresse/Kontakt ergänzen, dann Status anfragen<span class="sub">fällig 16.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Vegan Protein Powder – Produkt-Verifizierung Dubai (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Apple Cider – Produkt-Verifizierung Dubai</strong><span class="sub">Verifizierung</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>14.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#898781"></span><span class="ic">○</span>Neu</span></div>
+<div class="c-ship"><span class='shipline muted'>–</span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>–</div>
+<div class="c-action due">E-Mail-Adresse/Kontakt ergänzen, dann Status anfragen<span class="sub">fällig 16.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Apple Cider – Produkt-Verifizierung Dubai (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
+</details>
+</div>
+</details>
+<h3>Verlauf</h3>
+<section class="card logcard"><div class='lrow'><span class='ld'>18.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Aufgabe angelegt</span><span class='ldetails'>Neue Aufgabe bei Victor: Organic Certificate für Vegan Protein — Victor prüft, Status 'In Klärung'.</span></div><div class='lrow'><span class='ld'>15.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Produktion fertig</span><span class='ldetails'>Victor meldet: Collagen Sachets fertig produziert. 31 Kartons (30 volle à 30 Boxen + 1 kleiner mit 2 Boxen = 902 Boxen). Kartonmaß 64 x 38,5 x 39 cm, 17,5 kg/Karton, gesamt ca. 2,98 m³ / ~540 kg. Versandbereit — Versanddetails offen.</span></div><div class='lrow'><span class='ld'>15.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Victor hinterlegt: bv3994470@gmail.com</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>CRM angelegt</span><span class='ldetails'>CRM mit Test-Hersteller (bessomaik@gmail.com) und zwei Beispiel-Bestellungen aufgesetzt.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Jenny</span><span class='levent'>Bestellungen erfasst</span><span class='ldetails'>6 Muster veganes Proteinpulver bei Jenny erfasst (Cookies & Cream, Chocolate, Salted Caramel, Strawberry, Vanilla, Coffee). E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Jenny</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Jenny hinterlegt: Jenny@healthsupplementfactory.com</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Bulk-Order Shilajit bei Rejina erfasst. Status: Wartet auf unsere Zahlung. E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Zahlungsdaten erhalten</span><span class='ldetails'>Bankverbindung für Shilajit-Bulk-Order erhalten (DBS Bank Hong Kong, HKGZKNBJ LIMITED). Betrag: $2.751 = 2.413,37 EUR. Zahlung per SWIFT/CHATS, Invoice-Nr. im Verwendungszweck.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Rejina hinterlegt: Rejina@jiabeikang.net</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Bestellungen erfasst</span><span class='ldetails'>3 Muster veganes Proteinpulver bei Victor erfasst (Salted Caramel, Cookies & Cream, Chocolate Peanut Butter). E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Hersteller 2 Test</span><span class='levent'>Versendet (Beispiel)</span><span class='ldetails'>Testprodukt C als versendet markiert: Tracking TEST-123456789-DE, Ankunft ca. 20.07.2026 (Demo der neuen Lieferfelder).</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Eurofins Verification</span><span class='levent'>Vorgang erfasst</span><span class='ldetails'>Eurofins-Verifizierung für 'Apple Cider 7 Day Trial' erfasst (TR178109169477623 / ASIN B0H3TP27BJ). Ziel: Produkt-Freischaltung.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Dubai Product Verification</span><span class='levent'>Vorgänge erfasst</span><span class='ldetails'>Dubai Product Verification angelegt mit 2 Vorgängen: Vegan Protein Powder und Apple Cider. Kontakt-E-Mail fehlt noch.</span></div><div class='lrow'><span class='ld'>10.07.2026</span><span class='lwho'>Hersteller 2 Test</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Muster 'Testprodukt C' bei Hersteller 2 Test bestellt.</span></div><div class='lrow'><span class='ld'>09.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Anfrage gesendet</span><span class='ldetails'>Statusanfrage zu 'Testprodukt B' an bessomaik@gmail.com geschickt. Status: Wartet auf Antwort.</span></div><div class='lrow'><span class='ld'>07.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>'Testprodukt B' (TP-B-100) bei Testfirma bestellt.</span></div><div class='lrow'><span class='ld'>30.06.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Muster 'Testprodukt A' bei Testfirma bestellt.</span></div></section>
+<footer>Automatische Prüfung: Montag, Mittwoch, Freitag · Pflege durch Claude, Datenbasis crm_data.json / CRM_Bestellungen.xlsx</footer>
+</div>
+<style>
+.mc-0 { --mc:#2a78d6; }
+@media (prefers-color-scheme: dark) { .mc-0 { --mc:#3987e5; } }
+.mc-1 { --mc:#1baf7a; }
+@media (prefers-color-scheme: dark) { .mc-1 { --mc:#199e70; } }
+.mc-2 { --mc:#eda100; }
+@media (prefers-color-scheme: dark) { .mc-2 { --mc:#c98500; } }
+.mc-3 { --mc:#008300; }
+@media (prefers-color-scheme: dark) { .mc-3 { --mc:#008300; } }
+.mc-4 { --mc:#4a3aa7; }
+@media (prefers-color-scheme: dark) { .mc-4 { --mc:#9085e9; } }
+.mc-5 { --mc:#e34948; }
+@media (prefers-color-scheme: dark) { .mc-5 { --mc:#e66767; } }
+.mc-6 { --mc:#e87ba4; }
+@media (prefers-color-scheme: dark) { .mc-6 { --mc:#d55181; } }
+</style>
+</body>
+</html>
