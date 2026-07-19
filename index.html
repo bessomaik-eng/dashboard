@@ -63,6 +63,8 @@ letter-spacing:.05em; color:var(--mc); border:1px dashed var(--mc);
 border-radius:4px; padding:1px 6px; margin-left:8px; vertical-align:2px; }
 /* Lieferungs-Karten */
 .shipcard { border-left:4px solid #256abf; }
+.shipdone { border-left-color:#0ca30c; opacity:.82; }
+.shipdone .shiphead { background:color-mix(in srgb, #0ca30c 6%, transparent); }
 .shiphead { background:color-mix(in srgb, #256abf 7%, transparent); }
 .shipcard[open] .shiphead { border-bottom:1px solid color-mix(in srgb, #256abf 25%, transparent); }
 .shipcard .mcount { max-width:220px; white-space:normal; }
@@ -165,6 +167,28 @@ body { padding:10px; }
 <div class="tile warn"><div class="tv">16</div><div class="tl">Aktionen fällig</div></div>
 <div class="tile "><div class="tv">0</div><div class="tl">Probleme</div></div>
 </div>
+<h3 class="ghead">📦 Lieferungen · 0 unterwegs · 1 zugestellt</h3><details class="card shipcard shipdone">
+<summary class="mhead shiphead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname">✅ Focus Kapseln (300 Stück) von Victor</span>
+<span class="memail">UPS Standard · <code>1Z H9R 828 68 2384 3145</code></span></span>
+<span class="mcount">Zugestellt am 13.07.2026, 11:22 Uhr (angenommen von 'stuewe')<br><span class="lastcheck">geprüft 19.07.2026</span></span>
+</summary>
+<div class="mbody">
+<div class="pbar">
+<div class="pbar-track"><div class="pbar-fill" style="width:100%; background:linear-gradient(90deg,#eda100,#0ca30c); background-size:100% 100%;"></div>
+<span class="pbar-truck" style="left:100%">✅</span></div>
+<div class="pbar-labels"><span>✈ 24.06.2026</span><span class="pbar-day">angekommen</span><span>✅ Zugestellt 13.07.2026</span></div>
+</div>
+<div class="shipinfo">
+<div><span class="silabel">Von</span> Victor</div>
+<div><span class="silabel">An</span> VYTRITION GMBH, Buldernweg 55, 48163 Münster (DE)</div>
+<div><span class="silabel">Zugestellt</span> 13.07.2026</div>
+<div><span class="silabel">Tracking</span> <a href="https://www.ups.com/track?loc=de_DE&tracknum=1ZH9R8286823843145" target="_blank" rel="noopener">Bei UPS verfolgen ↗</a></div>
+</div>
+<div class="htitle" style="margin-top:10px">Verlauf</div><div class='hrow'><span class='hdate'>19.07.2026</span><span class='hdetails'>UPS-Prüfung: Zugestellt am 13.07.2026 um 11:22 an MUENSTER DE (Büro), Received by: stuewe. Versandt am 24.06.2026.</span></div>
+</div>
+</details>
 <h3 class="ghead">Hersteller</h3>
 <details class="card mcard mc-0" id="man-H1">
 <summary class="mhead">
