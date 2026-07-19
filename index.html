@@ -61,6 +61,24 @@ background:color-mix(in srgb, var(--surface) 94%, var(--mc) 6%); }
 .vbadge { display:inline-block; font-size:10px; font-weight:700; text-transform:uppercase;
 letter-spacing:.05em; color:var(--mc); border:1px dashed var(--mc);
 border-radius:4px; padding:1px 6px; margin-left:8px; vertical-align:2px; }
+/* Lieferungs-Karten */
+.shipcard { border-left:4px solid #256abf; }
+.shiphead { background:color-mix(in srgb, #256abf 7%, transparent); }
+.shipcard[open] .shiphead { border-bottom:1px solid color-mix(in srgb, #256abf 25%, transparent); }
+.shipcard .mcount { max-width:220px; white-space:normal; }
+.lastcheck { color:var(--muted); font-size:11px; }
+.shipinfo { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:6px 16px; font-size:13px; }
+.silabel { display:inline-block; min-width:80px; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.04em; }
+.shipinfo a { color:#256abf; }
+.pbar { margin:4px 0 14px; }
+.pbar-track { position:relative; height:10px; border-radius:999px;
+background:var(--grid); overflow:visible; }
+.pbar-fill { height:100%; border-radius:999px; }
+.pbar-truck { position:absolute; top:-9px; transform:translateX(-55%);
+font-size:15px; line-height:1; }
+.pbar-labels { display:flex; justify-content:space-between; gap:8px;
+margin-top:6px; font-size:11px; color:var(--ink2); }
+.pbar-day { color:var(--muted); }
 /* Typ-Gruppen */
 .grow { padding:14px 0 6px; border-bottom:2px solid var(--mc); margin-bottom:2px; }
 .glabel { font-size:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; }
@@ -140,13 +158,35 @@ body { padding:10px; }
 <body>
 <div class="wrap">
 <h1>Bestell-CRM</h1>
-<div class="stand">Muster- &amp; Produktbestellungen bei Herstellern · Stand: 18.07.2026</div>
+<div class="stand">Muster- &amp; Produktbestellungen bei Herstellern · Stand: 19.07.2026</div>
 <div class="tiles">
-<div class="tile"><div class="tv">17</div><div class="tl">Offene Bestellungen</div></div>
+<div class="tile"><div class="tv">18</div><div class="tl">Offene Bestellungen</div></div>
 <div class="tile"><div class="tv">2</div><div class="tl">Warten auf Antwort</div></div>
 <div class="tile warn"><div class="tv">16</div><div class="tl">Aktionen fällig</div></div>
 <div class="tile "><div class="tv">0</div><div class="tl">Probleme</div></div>
 </div>
+<h3 class="ghead">📦 Lieferungen unterwegs · 1</h3><details class="card shipcard">
+<summary class="mhead shiphead">
+<span class="chev">▸</span>
+<span class="mtitle"><span class="mname">🚚 Focus Kapseln (300 Stück) von Victor</span>
+<span class="memail">UPS Standard · <code>1Z H9R 828 68 2384 3145</code></span></span>
+<span class="mcount">Unterwegs – Erststatus wird geprüft</span>
+</summary>
+<div class="mbody">
+<div class="pbar">
+<div class="pbar-track"><div class="pbar-fill" style="width:3%; background:linear-gradient(90deg,#eda100,#0ca30c); background-size:3333% 100%;"></div>
+<span class="pbar-truck" style="left:3%">🚚</span></div>
+<div class="pbar-labels"><span>✈ 19.07.2026</span><span class="pbar-day">Tag 0 von 5</span><span>Ankunft ca. 24.07.2026 <span class='lastcheck'>(geschätzt (UPS Standard), wird nach erster UPS-Prüfung präzisiert)</span></span></div>
+</div>
+<div class="shipinfo">
+<div><span class="silabel">Von</span> Victor</div>
+<div><span class="silabel">An</span> VYTRITION GMBH, Buldernweg 55, 48163 Münster (DE)</div>
+<div><span class="silabel">Ankunft ca.</span> 24.07.2026</div>
+<div><span class="silabel">Tracking</span> <a href="https://www.ups.com/track?loc=de_DE&tracknum=1ZH9R8286823843145" target="_blank" rel="noopener">Bei UPS verfolgen ↗</a></div>
+</div>
+<div class="tdetails" style="margin-top:8px">Noch keine Statusmeldungen — die automatische Prüfung läuft alle 2 Tage.</div>
+</div>
+</details>
 <h3 class="ghead">Hersteller</h3>
 <details class="card mcard mc-0" id="man-H1">
 <summary class="mhead">
@@ -297,7 +337,7 @@ body { padding:10px; }
 <span class="chev">▸</span>
 <span class="mtitle"><span class="mname"><span class="mdot"></span>Victor</span>
 <span class="memail">bv3994470@gmail.com</span></span>
-<span class="mcount">4 Bestellungen · <span class="tcount">📋 1 offen</span></span>
+<span class="mcount">5 Bestellungen · <span class="tcount">📋 1 offen</span></span>
 </summary>
 <div class="mbody">
 <div class="grow"><span class="glabel">🧪 Muster</span><span class="gdesc">Musterbestellungen zum Testen · 3</span></div><details class="orow">
@@ -330,7 +370,7 @@ body { padding:10px; }
 <div class="c-action due">Erste Statusanfrage senden (Sammel-Mail für alle 3 Sorten)<span class="sub">fällig 15.07.2026</span></div>
 </summary>
 <div class="hbox"><div class="htitle">Verlauf – Vegan Protein Powder – Chocolate Peanut Butter (0 Einträge)</div><div class='hrow'><span class='hdetails'>Noch keine Einträge.</span></div></div>
-</details><div class="grow"><span class="glabel">📦 Bulk-Bestellungen</span><span class="gdesc">Richtige Bestellungen / Bulk Orders · 1</span></div><details class="orow">
+</details><div class="grow"><span class="glabel">📦 Bulk-Bestellungen</span><span class="gdesc">Richtige Bestellungen / Bulk Orders · 2</span></div><details class="orow">
 <summary class="ogrid">
 <div class="c-prod"><span class="arrow">▸</span><strong>Collagen Sachets</strong><span class="sub">Bulk</span></div>
 <div class="c-date"><span class="ml">Bestellt: </span>15.07.2026</div>
@@ -340,6 +380,16 @@ body { padding:10px; }
 <div class="c-action due">Versand klären: Abholung/Spedition, Versanddatum + Tracking erfragen<span class="sub">fällig 17.07.2026</span></div>
 </summary>
 <div class="hbox"><div class="htitle">Verlauf – Collagen Sachets (1 Einträge)</div><div class='hrow'><span class='hdate'>15.07.2026</span><span class='hevent'>Produktion fertig</span><span class='hdetails'>Victor meldet: Collagen Sachets fertig produziert. 31 Kartons (30 volle à 30 Boxen + 1 kleiner mit 2 Boxen = 902 Boxen). Kartonmaß 64 x 38,5 x 39 cm, 17,5 kg/Karton, gesamt ca. 2,98 m³ / ~540 kg. Versandbereit — Versanddetails offen.</span></div></div>
+</details><details class="orow">
+<summary class="ogrid">
+<div class="c-prod"><span class="arrow">▸</span><strong>Focus Kapseln (300 Stück)</strong><span class="sub">Bulk</span></div>
+<div class="c-date"><span class="ml">Bestellt: </span>19.07.2026</div>
+<div class="c-status"><span class="chip"><span class="dot" style="background:#256abf"></span><span class="ic">🚚</span>Versendet</span></div>
+<div class="c-ship"><span class='shipline ok'>✈ Versendet 19.07.2026</span><span class='shipline'><code>1Z H9R 828 68 2384 3145</code></span><span class='shipline'>Ankunft&nbsp;ca. <strong>24.07.2026</strong></span></div>
+<div class="c-contact"><span class="ml">Letzter Kontakt: </span>19.07.2026</div>
+<div class="c-action ">Sendung verfolgen (automatische Prüfung alle 2 Tage)<span class="sub">fällig 21.07.2026</span></div>
+</summary>
+<div class="hbox"><div class="htitle">Verlauf – Focus Kapseln (300 Stück) (1 Einträge)</div><div class='hrow'><span class='hdate'>19.07.2026</span><span class='hevent'>Lieferung erfasst</span><span class='hdetails'>Victor hat 300 Focus Kapseln versendet: UPS Standard, Tracking 1Z H9R 828 68 2384 3145, an Vytrition GmbH, Buldernweg 55, 48163 Münster. Automatische Sendungsverfolgung alle 2 Tage eingerichtet.</span></div></div>
 </details>
 <div class="tasks"><div class="glabel tlabel">📋 Aufgaben &amp; Klärungen</div><div class="trow"><div><span class="chip"><span class="dot" style="background:#fab219"></span><span class="ic">⏳</span>In Klärung</span></div>
 <div><strong>Organic Certificate für Vegan Protein</strong><div class="tdetails">Victor prüft gerade, ob ein Organic-Zertifikat für das Protein möglich ist / vorliegt.</div><div class="tmeta">bei: Victor · seit 18.07.2026</div></div></div></div>
@@ -399,7 +449,7 @@ body { padding:10px; }
 </div>
 </details>
 <h3>Verlauf</h3>
-<section class="card logcard"><div class='lrow'><span class='ld'>18.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Aufgabe angelegt</span><span class='ldetails'>Neue Aufgabe bei Victor: Organic Certificate für Vegan Protein — Victor prüft, Status 'In Klärung'.</span></div><div class='lrow'><span class='ld'>15.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Produktion fertig</span><span class='ldetails'>Victor meldet: Collagen Sachets fertig produziert. 31 Kartons (30 volle à 30 Boxen + 1 kleiner mit 2 Boxen = 902 Boxen). Kartonmaß 64 x 38,5 x 39 cm, 17,5 kg/Karton, gesamt ca. 2,98 m³ / ~540 kg. Versandbereit — Versanddetails offen.</span></div><div class='lrow'><span class='ld'>15.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Victor hinterlegt: bv3994470@gmail.com</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>CRM angelegt</span><span class='ldetails'>CRM mit Test-Hersteller (bessomaik@gmail.com) und zwei Beispiel-Bestellungen aufgesetzt.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Jenny</span><span class='levent'>Bestellungen erfasst</span><span class='ldetails'>6 Muster veganes Proteinpulver bei Jenny erfasst (Cookies & Cream, Chocolate, Salted Caramel, Strawberry, Vanilla, Coffee). E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Jenny</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Jenny hinterlegt: Jenny@healthsupplementfactory.com</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Bulk-Order Shilajit bei Rejina erfasst. Status: Wartet auf unsere Zahlung. E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Zahlungsdaten erhalten</span><span class='ldetails'>Bankverbindung für Shilajit-Bulk-Order erhalten (DBS Bank Hong Kong, HKGZKNBJ LIMITED). Betrag: $2.751 = 2.413,37 EUR. Zahlung per SWIFT/CHATS, Invoice-Nr. im Verwendungszweck.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Rejina hinterlegt: Rejina@jiabeikang.net</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Bestellungen erfasst</span><span class='ldetails'>3 Muster veganes Proteinpulver bei Victor erfasst (Salted Caramel, Cookies & Cream, Chocolate Peanut Butter). E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Hersteller 2 Test</span><span class='levent'>Versendet (Beispiel)</span><span class='ldetails'>Testprodukt C als versendet markiert: Tracking TEST-123456789-DE, Ankunft ca. 20.07.2026 (Demo der neuen Lieferfelder).</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Eurofins Verification</span><span class='levent'>Vorgang erfasst</span><span class='ldetails'>Eurofins-Verifizierung für 'Apple Cider 7 Day Trial' erfasst (TR178109169477623 / ASIN B0H3TP27BJ). Ziel: Produkt-Freischaltung.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Dubai Product Verification</span><span class='levent'>Vorgänge erfasst</span><span class='ldetails'>Dubai Product Verification angelegt mit 2 Vorgängen: Vegan Protein Powder und Apple Cider. Kontakt-E-Mail fehlt noch.</span></div><div class='lrow'><span class='ld'>10.07.2026</span><span class='lwho'>Hersteller 2 Test</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Muster 'Testprodukt C' bei Hersteller 2 Test bestellt.</span></div><div class='lrow'><span class='ld'>09.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Anfrage gesendet</span><span class='ldetails'>Statusanfrage zu 'Testprodukt B' an bessomaik@gmail.com geschickt. Status: Wartet auf Antwort.</span></div><div class='lrow'><span class='ld'>07.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>'Testprodukt B' (TP-B-100) bei Testfirma bestellt.</span></div><div class='lrow'><span class='ld'>30.06.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Muster 'Testprodukt A' bei Testfirma bestellt.</span></div></section>
+<section class="card logcard"><div class='lrow'><span class='ld'>19.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Lieferung erfasst</span><span class='ldetails'>Victor hat 300 Focus Kapseln versendet: UPS Standard, Tracking 1Z H9R 828 68 2384 3145, an Vytrition GmbH, Buldernweg 55, 48163 Münster. Automatische Sendungsverfolgung alle 2 Tage eingerichtet.</span></div><div class='lrow'><span class='ld'>19.07.2026</span><span class='lwho'></span><span class='levent'>Mailversand-Test erfolgreich</span><span class='ldetails'>Testmail über Maiks Gmail (Browser) gesendet und im Posteingang bestätigt. Versandweg für Hersteller-Mails steht.</span></div><div class='lrow'><span class='ld'>18.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Aufgabe angelegt</span><span class='ldetails'>Neue Aufgabe bei Victor: Organic Certificate für Vegan Protein — Victor prüft, Status 'In Klärung'.</span></div><div class='lrow'><span class='ld'>15.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Produktion fertig</span><span class='ldetails'>Victor meldet: Collagen Sachets fertig produziert. 31 Kartons (30 volle à 30 Boxen + 1 kleiner mit 2 Boxen = 902 Boxen). Kartonmaß 64 x 38,5 x 39 cm, 17,5 kg/Karton, gesamt ca. 2,98 m³ / ~540 kg. Versandbereit — Versanddetails offen.</span></div><div class='lrow'><span class='ld'>15.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Victor hinterlegt: bv3994470@gmail.com</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>CRM angelegt</span><span class='ldetails'>CRM mit Test-Hersteller (bessomaik@gmail.com) und zwei Beispiel-Bestellungen aufgesetzt.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Jenny</span><span class='levent'>Bestellungen erfasst</span><span class='ldetails'>6 Muster veganes Proteinpulver bei Jenny erfasst (Cookies & Cream, Chocolate, Salted Caramel, Strawberry, Vanilla, Coffee). E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Jenny</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Jenny hinterlegt: Jenny@healthsupplementfactory.com</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Bulk-Order Shilajit bei Rejina erfasst. Status: Wartet auf unsere Zahlung. E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Zahlungsdaten erhalten</span><span class='ldetails'>Bankverbindung für Shilajit-Bulk-Order erhalten (DBS Bank Hong Kong, HKGZKNBJ LIMITED). Betrag: $2.751 = 2.413,37 EUR. Zahlung per SWIFT/CHATS, Invoice-Nr. im Verwendungszweck.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Rejina</span><span class='levent'>Kontaktdaten ergänzt</span><span class='ldetails'>E-Mail-Adresse für Rejina hinterlegt: Rejina@jiabeikang.net</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Victor</span><span class='levent'>Bestellungen erfasst</span><span class='ldetails'>3 Muster veganes Proteinpulver bei Victor erfasst (Salted Caramel, Cookies & Cream, Chocolate Peanut Butter). E-Mail-Adresse fehlt noch.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Hersteller 2 Test</span><span class='levent'>Versendet (Beispiel)</span><span class='ldetails'>Testprodukt C als versendet markiert: Tracking TEST-123456789-DE, Ankunft ca. 20.07.2026 (Demo der neuen Lieferfelder).</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Eurofins Verification</span><span class='levent'>Vorgang erfasst</span><span class='ldetails'>Eurofins-Verifizierung für 'Apple Cider 7 Day Trial' erfasst (TR178109169477623 / ASIN B0H3TP27BJ). Ziel: Produkt-Freischaltung.</span></div><div class='lrow'><span class='ld'>14.07.2026</span><span class='lwho'>Dubai Product Verification</span><span class='levent'>Vorgänge erfasst</span><span class='ldetails'>Dubai Product Verification angelegt mit 2 Vorgängen: Vegan Protein Powder und Apple Cider. Kontakt-E-Mail fehlt noch.</span></div><div class='lrow'><span class='ld'>10.07.2026</span><span class='lwho'>Hersteller 2 Test</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Muster 'Testprodukt C' bei Hersteller 2 Test bestellt.</span></div><div class='lrow'><span class='ld'>09.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Anfrage gesendet</span><span class='ldetails'>Statusanfrage zu 'Testprodukt B' an bessomaik@gmail.com geschickt. Status: Wartet auf Antwort.</span></div><div class='lrow'><span class='ld'>07.07.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>'Testprodukt B' (TP-B-100) bei Testfirma bestellt.</span></div><div class='lrow'><span class='ld'>30.06.2026</span><span class='lwho'>Testfirma (Testlauf)</span><span class='levent'>Bestellung erfasst</span><span class='ldetails'>Muster 'Testprodukt A' bei Testfirma bestellt.</span></div></section>
 <footer>Automatische Prüfung: Montag, Mittwoch, Freitag · Pflege durch Claude, Datenbasis crm_data.json / CRM_Bestellungen.xlsx</footer>
 </div>
 <style>
